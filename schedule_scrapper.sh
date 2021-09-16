@@ -7,5 +7,5 @@ variable=$(curl --silent https://pwsztar.edu.pl/instytut-politechniczny/informat
 #   echo Hey: $variable
 # fi
 
-python scrapper.py $variable
+python3 scrapper.py "$variable"
 
