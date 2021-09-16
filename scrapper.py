@@ -2,8 +2,13 @@ import pydantic
 import sys
 
 def main():
-    print ('Number of arguments:', len(sys.argv), 'arguments.')
-    print ('Argument List:', str(sys.argv))
+   # print ('Number of arguments:', len(sys.argv), 'arguments.')
+   # print ('Argument List:', sys.argv[1])
+    
+    text = sys.argv[1]
+    date = ' '.join(text.split()[1:3])
+    print(date)
+
 
 if __name__ == "__main__":
     main()
