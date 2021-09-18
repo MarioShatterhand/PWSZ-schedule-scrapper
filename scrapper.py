@@ -9,7 +9,11 @@ def main():
     db = DatabaseClass()
     text = sys.argv[1]
     date = ' '.join(text.split()[1:3])
-    select = db.fetchone("SELECT * FROM ostatnia_aktualizacja")
+    try:
+        
+        select = db.fetchone("SELECT * FROM ostatnia_aktualizacja")
+    except Exception as e:
+        print(e)
     print(select)
     print(date)
 
