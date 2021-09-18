@@ -4,21 +4,25 @@ import sqlite3
 class DatabaseClass:
     def __init__(self) -> None:
         self.con = sqlite3.connect('dane.db')
+        self.cursor = self.con.cursor()
 
-    def fetchone(self, val: str):
+    def get_row(self, val: str):
         try:
-            cursor = self.con.cursor()
-            cursor.execute(val)
+            self.cursor.execute(val)
             self.con.commit()
-            return cursor.fetchone()
+            return self.cursor.fetchone()
         except Exception as e:
             print(e)
 
     def query(self, val: str):
         try:
-            cursor = self.con.cursor()
-            cursor.execute(val)
+            self.cursor.execute(val)
             self.con.commit()
         except Exception as e:
             print(e)
+
+    def close(self):
+        print("Close database")
+        self.cursor.close()
+        self.con.close()
 

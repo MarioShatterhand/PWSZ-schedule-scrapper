@@ -10,11 +10,13 @@ def main():
     text = sys.argv[1]
     date = ' '.join(text.split()[1:3])
     try:
-        select = db.fetchone(f"SELECT data_godzina FROM ostatnia_aktualizacja WHERE data_godzina == {date}")
+        select = db.get_row(f"SELECT data_godzina FROM ostatnia_aktualizacja WHERE data_godzina == '{date}'")[0]
         if select is None:
-            db.query(f"INSERT INTO ostatnia_aktualizacja VALUES(?, {date})")
+            print("Hmm?")
+            db.query(f"INSERT INTO ostatnia_aktualizacja (data_godzina) VALUES('{date}');")
     except Exception as e:
         print(e)
+    db.close()
     print("Select: ", select)
 
 
