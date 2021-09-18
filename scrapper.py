@@ -10,12 +10,12 @@ def main():
     text = sys.argv[1]
     date = ' '.join(text.split()[1:3])
     try:
-        
-        select = db.fetchone("SELECT * FROM ostatnia_aktualizacja")
+        select = db.fetchone(f"SELECT data_godzina FROM ostatnia_aktualizacja WHERE data_godzina == {date}")
+        if select is None:
+            db.query(f"INSERT INTO ostatnia_aktualizacja VALUES(?, {date})")
     except Exception as e:
         print(e)
-    print(select)
-    print(date)
+    print("Select: ", select)
 
 
 if __name__ == "__main__":

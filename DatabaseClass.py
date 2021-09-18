@@ -10,9 +10,15 @@ class DatabaseClass:
             cursor = self.con.cursor()
             cursor.execute(val)
             self.con.commit()
-            # print(cursor.fetchall())
             return cursor.fetchone()
-           # cursor.close()
+        except Exception as e:
+            print(e)
+
+    def query(self, val: str):
+        try:
+            cursor = self.con.cursor()
+            cursor.execute(val)
+            self.con.commit()
         except Exception as e:
             print(e)
 
