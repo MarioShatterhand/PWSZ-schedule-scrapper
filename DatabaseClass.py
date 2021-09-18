@@ -8,7 +8,7 @@ class DatabaseClass:
     def fetchone(self, val: str):
         try:
             cursor = self.con.cursor()
-            cursor.execute("SELECT * FROM ostatnia_aktualizacja")
+            cursor.execute(val)
             self.con.commit()
             # print(cursor.fetchall())
             return cursor.fetchone()
