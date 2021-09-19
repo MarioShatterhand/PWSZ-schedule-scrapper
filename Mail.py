@@ -4,13 +4,16 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import ssl
+import os
+from dotenv import load_dotenv
 
 class Mail:
     def __init__(self) -> None:
+        load_dotenv()
         self.port = 465  # For SSL
         self.smtp_server = "smtp.gmail.com"
-        self.sender_email = "basiajurek.mariusz@gmail.com"
-        self.password = "ymlcfntcaxiegokr"
+        self.sender_email = os.getenv("MAIL_ADDRESS")
+        self.password = os.getenv("MAIL_PASSWORD")
 
     def send_mail(self, files):
 

@@ -4,8 +4,6 @@ from DatabaseClass import DatabaseClass
 from requests_html import HTMLSession
 from Mail import Mail
 import wget
-from pdfminer.high_level import extract_text
-import tabula
 import os
 
 
