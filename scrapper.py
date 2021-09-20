@@ -47,7 +47,7 @@ def main():
                         filename = f"{group.full_text}.pdf"
                         wget.download(link, out=filename)
                         files.append(filename)
-            mail.send_mail(files)
+            mail.send_mail(files, text)
             db.query(
                 f"INSERT INTO ostatnia_aktualizacja (data_godzina) VALUES('{date}');")
 

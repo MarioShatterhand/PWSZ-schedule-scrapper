@@ -15,8 +15,8 @@ class Mail:
         self.sender_email = os.getenv("MAIL_ADDRESS")
         self.password = os.getenv("MAIL_PASSWORD")
 
-    def send_mail(self, files):
-
+    def send_mail(self, files, new_date=""):
+        print(new_date)
         # Create a multipart message and set headers
         message = MIMEMultipart()
         message["From"] = self.smtp_server
@@ -25,7 +25,7 @@ class Mail:
         # message["Bcc"] = receiver_email  # Recommended for mass emails
 
         # Add body to email
-        message.attach(MIMEText("", "plain"))
+        message.attach(MIMEText(new_date))
 
         # filename = "document.pdf"  # In same directory as script
         for filename in files:
