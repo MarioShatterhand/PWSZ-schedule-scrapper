@@ -5,11 +5,15 @@ from requests_html import HTMLSession
 from Mail import Mail
 import wget
 import os
+import subprocess
 
 
 def main():
     db = DatabaseClass()
     mail = Mail()
+    exit_code = subprocess.call(
+        'F:\MEGA\PWSZ-schedule-scrapper\schedule_scrapper.sh')
+    print("TUTUTU: ", exit_code)
     text = sys.argv[1]
     date = ' '.join(text.split()[1:3])
     files = []
