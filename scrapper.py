@@ -19,6 +19,7 @@ def main():
     text = ret.stdout.decode('UTF-8')
     reg = date_struct.findall(text)
     date = reg[1]
+    print(date)
     #date = ' '.join(text.split()[1:3])
     files = []
     try:
