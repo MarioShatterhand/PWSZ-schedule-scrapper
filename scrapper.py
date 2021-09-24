@@ -6,15 +6,18 @@ from Mail import Mail
 import wget
 import os
 import subprocess
+import re
 
 
 def main():
     db = DatabaseClass()
     mail = Mail()
+    date_struct = re.compile("\d\d\d\d-\d\d-\d\d \d\d:\d\d")
     command = 'curl --silent https://pwsztar.edu.pl/instytut-politechniczny/informatyka/harmonogramy/'
-
     ret = subprocess.run(command, capture_output=True, shell=True)
     text = ret.stdout.decode('UTF-8')
+    reg = date_struct.findall(text)
+    print(reg)
     date = ' '.join(text.split()[1:3])
     files = []
     try:
