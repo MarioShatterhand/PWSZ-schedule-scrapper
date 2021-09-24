@@ -17,8 +17,8 @@ def main():
     ret = subprocess.run(command, capture_output=True, shell=True)
     text = ret.stdout.decode('UTF-8')
     reg = date_struct.findall(text)
-    print(reg)
-    date = ' '.join(text.split()[1:3])
+    date = reg[1]
+    #date = ' '.join(text.split()[1:3])
     files = []
     try:
         try:
@@ -54,7 +54,7 @@ def main():
                         filename = f"{group.full_text}.pdf"
                         wget.download(link, out=filename)
                         files.append(filename)
-            mail.send_mail(files, text)
+            mail.send_mail(files, date)
             db.query(
                 f"INSERT INTO ostatnia_aktualizacja (data_godzina) VALUES('{date}');")
 
