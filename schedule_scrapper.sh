@@ -7,5 +7,5 @@ variable=$(curl --silent https://pwsztar.edu.pl/instytut-politechniczny/informat
 #   echo Hey: $variable
 # fi
 
-echo $variable
+echo "$variable"
 

@@ -11,10 +11,10 @@ import subprocess
 def main():
     db = DatabaseClass()
     mail = Mail()
-    exit_code = subprocess.call(
-        'F:\MEGA\PWSZ-schedule-scrapper\schedule_scrapper.sh')
-    print("TUTUTU: ", exit_code)
-    text = sys.argv[1]
+    command = 'curl --silent https://pwsztar.edu.pl/instytut-politechniczny/informatyka/harmonogramy/'
+
+    ret = subprocess.run(command, capture_output=True, shell=True)
+    text = ret.stdout.decode('UTF-8')
     date = ' '.join(text.split()[1:3])
     files = []
     try:
