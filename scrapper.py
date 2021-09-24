@@ -10,7 +10,6 @@ import re
 import hashlib
 
 
-
 def main():
     db = DatabaseClass()
     mail = Mail()
@@ -58,7 +57,15 @@ def main():
                         files.append(filename)
             for file in files:
                 m = hash_file(file)
-                db.query(f"INSERT INTO pliki VALUES('{m}', '{file}')")
+                try:
+                    select = db.get_row(
+                        f"SELECT nazwa FROM pliki WHERE sha == '{m}'")[0]
+                    print("SELECT: ", select)
+                    files.remove(select)
+                except TypeError:
+                    select = None
+                if select is None:
+                    db.query(f"INSERT INTO pliki VALUES('{m}', '{file}')")
             mail.send_mail(files, date)
             db.query(
                 f"INSERT INTO ostatnia_aktualizacja (data_godzina) VALUES('{date}');")
@@ -72,25 +79,27 @@ def main():
         print(e)
     db.close()
 
+
 def hash_file(filename):
-   """"This function returns the SHA-1 hash
-   of the file passed into it"""
+    """"This function returns the SHA-1 hash
+    of the file passed into it"""
 
-   # make a hash object
-   h = hashlib.sha1()
+    # make a hash object
+    h = hashlib.sha1()
 
-   # open file for reading in binary mode
-   with open(filename,'rb') as file:
+    # open file for reading in binary mode
+    with open(filename, 'rb') as file:
 
-       # loop till the end of the file
-       chunk = 0
-       while chunk != b'':
-           # read only 1024 bytes at a time
-           chunk = file.read(1024)
-           h.update(chunk)
+        # loop till the end of the file
+        chunk = 0
+        while chunk != b'':
+            # read only 1024 bytes at a time
+            chunk = file.read(1024)
+            h.update(chunk)
 
-   # return the hex representation of digest
-   return h.hexdigest()
+    # return the hex representation of digest
+    return h.hexdigest()
+
 
 if __name__ == "__main__":
     main()
