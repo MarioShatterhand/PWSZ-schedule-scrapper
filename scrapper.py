@@ -58,7 +58,7 @@ def main():
                         files.append(filename)
             for file in files:
                 m = hash_file(file)
-                print(m)
+                db.query(f"INSERT INTO pliki VALUES('{m}', '{file}')")
             mail.send_mail(files, date)
             db.query(
                 f"INSERT INTO ostatnia_aktualizacja (data_godzina) VALUES('{date}');")
