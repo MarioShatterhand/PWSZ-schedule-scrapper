@@ -15,12 +15,14 @@ class Mail:
         self.sender_email = os.getenv("MAIL_ADDRESS")
         self.password = os.getenv("MAIL_PASSWORD")
 
-    def send_mail(self, files, new_date=""):
+    def send_mail(self, filename, new_date="", recipient=""):
         print(new_date)
+        print("PLIK DO WYSŁANIA: ", filename)
+        print(recipient)
         # Create a multipart message and set headers
         message = MIMEMultipart()
         message["From"] = self.smtp_server
-        message["To"] = "mario.pierzchala@outlook.com"
+        message["To"] = recipient
         message["Subject"] = "Nowy harmonogram zajęć na PWSZ"
         # message["Bcc"] = receiver_email  # Recommended for mass emails
 
@@ -28,29 +30,28 @@ class Mail:
         message.attach(MIMEText(new_date))
 
         # filename = "document.pdf"  # In same directory as script
-        for filename in files:
-            # Open PDF file in binary mode
-            with open(filename, "rb") as attachment:
-                # Add file as application/octet-stream
-                # Email client can usually download this automatically as attachment
-                part = MIMEBase("application", "octet-stream")
-                part.set_payload(attachment.read())
+        
+        with open(filename, "rb") as attachment:
+            # Add file as application/octet-stream
+            # Email client can usually download this automatically as attachment
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(attachment.read())
 
-            # Encode file in ASCII characters to send by email
-            encoders.encode_base64(part)
+        # Encode file in ASCII characters to send by email
+        encoders.encode_base64(part)
 
-            # Add header as key/value pair to attachment part
-            part.add_header(
-                "Content-Disposition",
-                f"attachment; filename= {filename}",
-            )
+        # Add header as key/value pair to attachment part
+        part.add_header(
+            "Content-Disposition",
+            f"attachment; filename= {filename}",
+        )
 
-            # Add attachment to message and convert message to string
-            message.attach(part)
+        # Add attachment to message and convert message to string
+        message.attach(part)
         text = message.as_string()
 
         # Log in to server using secure context and send email
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
             server.login(self.sender_email, self.password)
-            server.sendmail(self.sender_email, "mario.pierzchala@outlook.com", text)
+            server.sendmail(self.sender_email, recipient, text)

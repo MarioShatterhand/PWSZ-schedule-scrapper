@@ -8,9 +8,12 @@ import os
 import subprocess
 import re
 import hashlib
+import datetime
 
 
 def main():
+    now = datetime.datetime.now()
+    print("\n Wykonano: ", (str(now))
     db = DatabaseClass()
     mail = Mail()
     date_struct = re.compile("\d\d\d\d-\d\d-\d\d \d\d:\d\d")
@@ -22,7 +25,11 @@ def main():
     print(date)
     #date = ' '.join(text.split()[1:3])
     files = []
+    users = []
     try:
+        users = db.get_rows("SELECT * FROM studenci")
+        print(users[0])
+        
         try:
             select = db.get_row(
                 f"SELECT data_godzina FROM ostatnia_aktualizacja WHERE data_godzina == '{date}'")[0]
@@ -32,50 +39,61 @@ def main():
             s = HTMLSession()
             r = s.get(
                 "https://pwsztar.edu.pl/instytut-politechniczny/informatyka/harmonogramy/")
-
-            sel = '#rozmCZ > ul:nth-child(5) > li:nth-child(3) > ul > li'
-
+            sel = '#rozmCZ > ul:nth-child(5)'
             schedules = r.html.find(sel)
-
+            print(schedules)
             for schedule in schedules:
-                if schedule.full_text == "Informatyka w telekomunikacji" or schedule.full_text == "Informatyka w Telekomunikacji" or schedule.full_text == "Systemy teleinformatyczne" or schedule.full_text == "Systemy Teleinformatyczne":
-                    links = schedule.links
-                    for link in links:
-                        filename = f"{schedule.full_text}.pdf"
-                        wget.download(link, out=filename)
-                        files.append(filename)
+                print(schedule)
+            #     if schedule.full_text == "Informatyka w telekomunikacji" or schedule.full_text == "Informatyka w Telekomunikacji" or schedule.full_text == "Systemy teleinformatyczne" or schedule.full_text == "Systemy Teleinformatyczne":
+                links = schedule.links
+                # print(type(links))
+                for link in links:
+                    filename = link[50:]
+                    if filename[:3] == "wsz":
+                        filename = filename[::-1]
+                        filename = filename + "p"
+                        filename = filename[::-1]
+                        print("DODANE P: ", filename)
+                    wget.download(link, out=filename)
+                    print("CZĘŚĆ: ", filename[38:-4])
+                    files.append(filename)
 
-            sel = '#rozmCZ > ul:nth-child(7) > li:nth-child(3) > ul > li'
+                for file in files[:]:
+                    m = hash_file(file)
+                    try:
+                        select = db.get_row(
+                            f"SELECT nazwa FROM pliki WHERE sha == '{m}'")[0]
+                        print("File removed from sending list: ", select)
+                        files.remove(select)
+                    except TypeError:
+                        select = None
+                    if select is None:
+                        db.query(f"INSERT INTO pliki VALUES('{m}', '{file}')")
 
-            groups = r.html.find(sel)
+                for user in users:
+                    print(user)
+                    for file in files:
+                        # print("FILE: ", file[38:-4], " USER: ", user[1])
+                        if str(user[1]) == file[38:-4]:
+                            mail.send_mail(file, date, user[0])
+                            print("Pierwszy ", user[0])
 
-            for group in groups:
-                if group.full_text == "Systemy teleinformatyczne" or group.full_text == "Systemy Teleinformatyczne":
-                    links = group.links
-                    for link in links:
-                        filename = f"{group.full_text}.pdf"
-                        wget.download(link, out=filename)
-                        files.append(filename)
-            for file in files:
-                m = hash_file(file)
-                try:
-                    select = db.get_row(
-                        f"SELECT nazwa FROM pliki WHERE sha == '{m}'")[0]
-                    print("SELECT: ", select)
-                    files.remove(select)
-                except TypeError:
-                    select = None
-                if select is None:
-                    db.query(f"INSERT INTO pliki VALUES('{m}', '{file}')")
-            mail.send_mail(files, date)
+                        if user[2] != "" and user[2] in file[38:-4]:
+                            mail.send_mail(file, date, user[0])
+                            print("Drugi ", user[0]) 
+                
+
+            
+                    
+            # mail.send_mail(files, date)
             db.query(
                 f"INSERT INTO ostatnia_aktualizacja (data_godzina) VALUES('{date}');")
 
-            for file in files:
-                if os.path.exists(file):
-                    os.remove(file)
-                else:
-                    print("Can not delete the file as it doesn't exists")
+        for file in files:
+            if os.path.exists(file):
+                os.remove(file)
+            else:
+                print("Can not delete the file as it doesn't exists")
     except Exception as e:
         print(e)
     db.close()
