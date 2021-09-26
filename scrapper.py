@@ -26,6 +26,7 @@ def main():
     #date = ' '.join(text.split()[1:3])
     files = []
     users = []
+    sendfile = []
     try:
         users = db.get_rows("SELECT * FROM studenci")
         print(users[0])
@@ -44,9 +45,7 @@ def main():
             print(schedules)
             for schedule in schedules:
                 print(schedule)
-            #     if schedule.full_text == "Informatyka w telekomunikacji" or schedule.full_text == "Informatyka w Telekomunikacji" or schedule.full_text == "Systemy teleinformatyczne" or schedule.full_text == "Systemy Teleinformatyczne":
                 links = schedule.links
-                # print(type(links))
                 for link in links:
                     filename = link[50:]
                     if filename[:3] == "wsz":
@@ -56,6 +55,23 @@ def main():
                         print("DODANE P: ", filename)
                     wget.download(link, out=filename)
                     print("CZĘŚĆ: ", filename[38:-4])
+                    files.append(filename)
+
+            sel = '#rozmCZ > ul:nth-child(7)'
+            groups = r.html.find(sel)
+            print(groups)
+            for group in groups:
+                print(group)
+                links = group.links
+                for link in links:
+                    filename = link[50:]
+                    if filename[:3] == "wsz":
+                        filename = filename[::-1]
+                        filename = filename + "p"
+                        filename = filename[::-1]
+                        print("DODANE P: ", filename)
+                    wget.download(link, out=filename)
+                    print("CZĘŚĆ: ", filename[39:-4])
                     files.append(filename)
 
                 for file in files[:]:
@@ -78,18 +94,17 @@ def main():
                     print(user)
                     for file in files:
                         # print("FILE: ", file[38:-4], " USER: ", user[1])
-                        if str(user[1]) == file[38:-4]:
-                            mail.send_mail(file, date, user[0])
+                        if str(user[1]) == file[38:-4] or str(user[1]) == file[39:-4]:
+                            sendfile.append(file)
                             print("Pierwszy ", user[0])
 
-                        if user[2] != "" and user[2] in file[38:-4]:
-                            mail.send_mail(file, date, user[0])
+                        if user[2] != "" and user[2] in file[38:-4] or user[2] in file[39:-4]:
+                            sendfile.append(file)
                             print("Drugi ", user[0]) 
-                
+                    mail.send_mail(sendfile, date, user[0])
+                    sendfile = []
 
             
-                    
-            # mail.send_mail(files, date)
             db.query(
                 f"INSERT INTO ostatnia_aktualizacja (data_godzina) VALUES('{date}');")
 
