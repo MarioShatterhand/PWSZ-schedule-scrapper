@@ -14,6 +14,14 @@ class DatabaseClass:
         except Exception as e:
             print(e)
 
+    def get_rows(self, val: str):
+        try:
+            self.cursor.execute(val)
+            self.con.commit()
+            return self.cursor.fetchall()
+        except Exception as e:
+            print(e)
+
     def query(self, val: str):
         try:
             self.cursor.execute(val)
