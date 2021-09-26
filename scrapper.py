@@ -13,7 +13,7 @@ import datetime
 
 def main():
     now = datetime.datetime.now()
-    print("\n Wykonano: ", (str(now))
+    print("\n Wykonano: ", (str(now)))
     db = DatabaseClass()
     mail = Mail()
     date_struct = re.compile("\d\d\d\d-\d\d-\d\d \d\d:\d\d")
@@ -64,6 +64,10 @@ def main():
                         select = db.get_row(
                             f"SELECT nazwa FROM pliki WHERE sha == '{m}'")[0]
                         print("File removed from sending list: ", select)
+                        if os.path.exists(select):
+                            os.remove(select)
+                        else:
+                            print("Can not delete the file as it doesn't exists")
                         files.remove(select)
                     except TypeError:
                         select = None
