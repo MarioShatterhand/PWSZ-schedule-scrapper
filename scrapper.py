@@ -21,7 +21,7 @@ def main():
     ret = subprocess.run(command, capture_output=True, shell=True)
     text = ret.stdout.decode('UTF-8')
     reg = date_struct.findall(text)
-    date = reg[1]
+    date = reg[0]
     print(date)
     #date = ' '.join(text.split()[1:3])
     files = []
@@ -29,11 +29,12 @@ def main():
     sendfile = []
     try:
         users = db.get_rows("SELECT * FROM studenci")
-        print(users[0])
+        print(users)
         
         try:
             select = db.get_row(
                 f"SELECT data_godzina FROM ostatnia_aktualizacja WHERE data_godzina == '{date}'")[0]
+            print("Odpowiedź na zapytanie SELECT: ", select)
         except TypeError:
             select = None
         if select is None:
@@ -74,35 +75,35 @@ def main():
                     print("CZĘŚĆ: ", filename[39:-4])
                     files.append(filename)
 
-                for file in files[:]:
-                    m = hash_file(file)
-                    try:
-                        select = db.get_row(
-                            f"SELECT nazwa FROM pliki WHERE sha == '{m}'")[0]
-                        print("File removed from sending list: ", select)
-                        if os.path.exists(select):
-                            os.remove(select)
-                        else:
-                            print("Can not delete the file as it doesn't exists")
-                        files.remove(select)
-                    except TypeError:
-                        select = None
-                    if select is None:
-                        db.query(f"INSERT INTO pliki VALUES('{m}', '{file}')")
+            for file in files[:]:
+                m = hash_file(file)
+                try:
+                    select = db.get_row(
+                        f"SELECT nazwa FROM pliki WHERE sha == '{m}'")[0]
+                    print("File removed from sending list: ", select)
+                    if os.path.exists(select):
+                        os.remove(select)
+                    else:
+                        print("Can not delete the file as it doesn't exists")
+                    files.remove(select)
+                except TypeError:
+                    select = None
+                if select is None:
+                    db.query(f"INSERT INTO pliki VALUES('{m}', '{file}')")
 
-                for user in users:
-                    print(user)
-                    for file in files:
-                        # print("FILE: ", file[38:-4], " USER: ", user[1])
-                        if str(user[1]) == file[38:-4] or str(user[1]) == file[39:-4]:
-                            sendfile.append(file)
-                            print("Pierwszy ", user[0])
+            for user in users:
+                print(user)
+                for file in files:
+                    # print("FILE: ", file[38:-4], " USER: ", user[1])
+                    if str(user[1]) == file[38:-4] or str(user[1]) == file[39:-4]:
+                        sendfile.append(file)
+                        print("Pierwszy ", user[0])
 
-                        if user[2] != "" and user[2] in file[38:-4] or user[2] in file[39:-4]:
-                            sendfile.append(file)
-                            print("Drugi ", user[0]) 
-                    mail.send_mail(sendfile, date, user[0])
-                    sendfile = []
+                    if user[2] != "" and user[2] in file[38:-4] or user[2] in file[39:-4]:
+                        sendfile.append(file)
+                        print("Drugi ", user[0]) 
+                mail.send_mail(sendfile, date, user[0])
+                sendfile = []
 
             
             db.query(
