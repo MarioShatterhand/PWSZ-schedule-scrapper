@@ -51,7 +51,11 @@ class Mail:
         text = message.as_string()
 
         # Log in to server using secure context and send email
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(self.sender_email, self.password)
-            server.sendmail(self.sender_email, recipient, text)
+        if len(files) != 0:
+            context = ssl.create_default_context()
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+                server.login(self.sender_email, self.password)
+                server.sendmail(self.sender_email, recipient, text)
+            print(f"Email has been sent to {recipient}")
+        else:
+            print("Pominięto wysyłanie maila, ponieważ nie znaleziono nowych plików do wysłania")

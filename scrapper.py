@@ -21,6 +21,9 @@ def main():
     ret = subprocess.run(command, capture_output=True, shell=True)
     text = ret.stdout.decode('UTF-8')
     reg = date_struct.findall(text)
+    if len(reg) == 0:
+        date_struct = re.compile("\d\d\d\d-\d\d-\d\d \d:\d\d")
+        reg = date_struct.findall(text)
     date = reg[0]
     print(date)
     #date = ' '.join(text.split()[1:3])
@@ -34,10 +37,11 @@ def main():
         try:
             select = db.get_row(
                 f"SELECT data_godzina FROM ostatnia_aktualizacja WHERE data_godzina == '{date}'")[0]
-            print("Odpowiedź na zapytanie SELECT: ", select)
+            print("Odpowiedź na zapytanie SELECT: ", select, " \n Jeżeli widzisz tą wiadomość, to bot nie pobrał plików, ponieważ znalazł datę aktualizacji w bazie danych")
         except TypeError:
             select = None
         if select is None:
+            print("Rozpoczęto pobieranie plików")
             s = HTMLSession()
             r = s.get(
                 "https://pwsztar.edu.pl/instytut-politechniczny/informatyka/harmonogramy/")
