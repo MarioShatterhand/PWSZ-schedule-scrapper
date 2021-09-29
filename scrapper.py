@@ -59,7 +59,7 @@ def main():
                         filename = filename[::-1]
                         print("DODANE P: ", filename)
                     wget.download(link, out=filename)
-                    print("CZĘŚĆ: ", filename[38:-4])
+                    # print("CZĘŚĆ: ", filename[38:-4])
                     files.append(filename)
 
             sel = '#rozmCZ > ul:nth-child(7)'
@@ -76,7 +76,7 @@ def main():
                         filename = filename[::-1]
                         print("DODANE P: ", filename)
                     wget.download(link, out=filename)
-                    print("CZĘŚĆ: ", filename[39:-4])
+                    # print("CZĘŚĆ: ", filename[39:-4])
                     files.append(filename)
 
             for file in files[:]:
